@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const socketIO = require('socket.io');
-const CryptoJS = require('crypto-js');
 
 const app = express();
 const port = 3000;
@@ -21,11 +20,7 @@ io.on('connection', (socket) => {
     console.log('User connected');
 
     socket.on('send-message', (data) => {
-        let content = data.content;
-
-        if(data.encrypt) {
-            content = CryptoJS.AES.encrypt(content, 'secretKey').toString();
-        }
+        const content = data.content;
 
         const message = new Message({ content: content, timestamp: new Date() });
         message.save();

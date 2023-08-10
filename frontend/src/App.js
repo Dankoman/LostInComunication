@@ -7,7 +7,7 @@ function App() {
     const [message, setMessage] = useState('');
 
     const sendMessage = () => {
-        socket.emit("send-message", { content: message, encrypt: true });
+        socket.emit("send-message", { content: message });
     };
 
     socket.on("receive-message", (data) => {
