@@ -1,0 +1,10 @@
+{
+    "name": "Game Project",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "backend",
+    "workspaceFolder": "/usr/src/app",
+    "mounts": [
+      "source=${localWorkspaceFolder}/customizations/vscode/settings.json,target=/usr/src/app/.vscode/settings.json,type=bind,consistency=cached"
+    ]
+  }
+  
