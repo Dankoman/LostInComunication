@@ -7,11 +7,14 @@ function App() {
     const [message, setMessage] = useState('');
 
     const sendMessage = () => {
+        // Logga när klienten skickar ett meddelande till servern
+        console.log('Sending message to server:', message);
         socket.emit("send-message", { content: message });
     };
 
     socket.on("receive-message", (data) => {
-        console.log(data.content);
+        // Logga när klienten mottar ett meddelande från servern
+        console.log('Received message from server:', data.content);
     });
 
     return (
