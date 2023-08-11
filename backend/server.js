@@ -4,7 +4,7 @@ const socketIO = require('socket.io');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:3001' }));
 const port = 3000;
 
 mongoose.connect('mongodb://mongo:27017/game', { useNewUrlParser: true, useUnifiedTopology: true });
