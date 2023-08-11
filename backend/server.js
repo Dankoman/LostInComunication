@@ -1,34 +1,61 @@
 const express = require('express');
-const socketIO = require('socket.io');
+const http = require('http');
+const socketIo = require('socket.io');
+const mongoose = require('mongoose');
 const cors = require('cors');
 
+const Message = require('./models/Message'); // Import the Message model
+
+const port = process.env.PORT || 3000;
 const app = express();
-app.use(cors({ origin: 'http://localhost:3001' }));
-const port = 3000;
 
-app.get('/', (req, res) => res.send('Backend is up and running!'));
+// Middleware for CORS
+app.use(cors({
+    origin: 'http://localhost:3001',
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
 
-const server = app.listen(port, () => console.log(`Server running on port ${port}`));
+const server = http.createServer(app);
 
-const io = socketIO(server, {
+const io = socketIo(server, {
     cors: {
-        origin: "http://localhost:3001",
-        methods: ["GET", "POST"],
-        allowedHeaders: ["my-custom-header"],
+        origin: 'http://localhost:3001',
+        methods: ['GET', 'POST'],
         credentials: true
     }
 });
+
+// Connect to MongoDB
+mongoose.connect('mongodb://mongo:27017/chat', { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('MongoDB Connected...'))
+    .catch(err => console.log(err));
+
 io.on('connection', (socket) => {
     console.log('User connected');
 
-    socket.on('send-message', (data) => {
-        const content = data.content;
+    socket.on('chat message', (msg) => {
+        console.log('message: ' + msg);
 
-        // Log when the server receives a message
-        console.log('Received message from client:', content);
+        // Save message to MongoDB
+        const newMessage = new Message({
+            content: msg
+        });
 
-        // Log when the server sends a message to all clients
-        console.log('Sending message to all clients:', content);
-        io.emit('receive-message', { content: content });
+        newMessage.save()
+            .then(() => {
+                console.log('Message saved to database');
+            })
+            .catch(err => {
+                console.error('Error saving message:', err);
+            });
+
+        io.emit('chat message', msg);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User left');
     });
 });
+
+server.listen(port, () => console.log(`Server running on port ${port}`));
