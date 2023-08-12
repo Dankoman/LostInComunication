@@ -30,6 +30,10 @@ const io = socketIo(server, {
 mongoose.connect('mongodb://mongo:27017/chat', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB Connected...'))
     .catch(err => console.log(err));
+    
+mongoose.connection.on('error', err => {
+    console.error('MongoDB connection error:', err);
+});
 
 io.on('connection', (socket) => {
     console.log('User connected');
